@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const ChatScreen = () => {
+const ChatScreen = ({ messages, onMessageSend }) => {
   const [inputText, setInputText] = useState("");
-  const [messages, setMessages] = useState([]);
   const textareaRef = useRef(null);
 
   const handleInputChange = (e) => {
@@ -10,8 +9,18 @@ const ChatScreen = () => {
   };
 
   const handleSendMessage = () => {
-    console.log("message send");
-    setInputText("");
+    if (inputText.trim() !== "") {
+      onMessageSend(inputText);
+      console.log("message send");
+      setInputText("");
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
   };
   useEffect(() => {
     adjustTextareaHeight();
@@ -26,9 +35,22 @@ const ChatScreen = () => {
   };
 
   return (
-    <div className="">
-      <div className="">messages</div>
-      <div className="fixed bottom-0 inset-x-0 h-auto flex items-center justify-center gap-4 py-4 px-4 bg-zinc-700">
+    <div className="w-full flex justify-evenly">
+      <h1 className=" w-8/12 rounded-xl py-2 mb-2 fixed top-0 left-1/2 -translate-x-1/2  text-2xl font-bold text-orange-500 text-center bg-slate-800 border-b-2 border-black">
+        Chat App
+      </h1>
+      <div className=" bg-slate-800 min-h-[80vh] w-8/12 px-4 py-4 pb-24">
+        {messages.map((message, index) => (
+          <div
+            className=" bg-sky-600 py-1 px-4 w-fit max-w-[50%] rounded-lg text-lg font-semibold mb-4 rounded-tl-none "
+            key={index}
+          >
+            {message.sender}
+            {message.message}
+          </div>
+        ))}
+      </div>
+      <div className="fixed bottom-0 inset-x-0 h-auto flex items-center justify-center gap-4 py-4 px-4 bg-slate-700">
         <textarea
           ref={textareaRef}
           rows={1}
@@ -36,12 +58,13 @@ const ChatScreen = () => {
           type="text"
           value={inputText}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           placeholder="Type Something..."
         />
         <button
           onClick={handleSendMessage}
           type="button"
-          class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-xl text-lg px-8 py-1.5 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+          class="focus:outline-none text-white bg-orange-600 hover:bg-orange-600 focus:ring-4 focus:ring-orange-600 font-medium rounded-xl text-lg px-8 py-1.5 dark:bg-orange-600 dark:hover:bg-orange-700 dark:focus:ring-green-800"
         >
           Send
         </button>
